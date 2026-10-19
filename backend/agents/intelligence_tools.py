@@ -201,6 +201,24 @@ class PolicyCheckerTool(BaseTool):
                             "suggested_fix": COMPANY_POLICIES["ip_ownership"]["redline_text"],
                             "clause_content": clause["content"]
                         })
+
+                # Knowledge + MCP Layer Integration (Phase 2 by Brittany Gunn)
+                # Queries dynamic legal playbook rules and precedent history
+                if "survival" in clause_type or ("confidential" in clause_type and "year" in content):
+                    if any(t in content for t in ["1 year", "2 year", "one (1)", "two (2)", "2 years", "two years"]):
+                        try:
+                            from mcp.mcp_tools import get_playbook_rule
+                            rule_info = get_playbook_rule("confidentiality_survival_minimum", "Survival")
+                            violations.append({
+                                "clause_type": "Survival",
+                                "issue": "Survival period < 3 years violates corporate playbook rule (pb_001)",
+                                "severity": "HIGH",
+                                "suggested_fix": "The obligations of confidentiality shall survive termination for a period of five (5) years.",
+                                "clause_content": clause.get("content", ""),
+                                "governing_policy": rule_info
+                            })
+                        except Exception as mcp_err:
+                            logger.debug("MCP layer query fallback: %s", mcp_err)
             
             logger.info(f"Found {len(violations)} policy violations")
             return json.dumps(violations)

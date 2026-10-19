@@ -5,16 +5,19 @@ import { ChatPage } from './pages/ChatPage';
 import { IntelligencePage } from './pages/IntelligencePage';
 import { DocumentationPage } from './pages/DocumentationPage';
 import { SearchPage } from './pages/SearchPage';
+import { MCPPage } from './pages/MCPPage';
 import { ErrorBoundary } from './components/shared/ErrorBoundary';
 import { ContractHistoryProvider } from './contexts/ContractHistoryContext';
 import { useRouter } from './lib/useRouter';
 import './App.css';
 
 function App() {
-  const { currentPage, navigate } = useRouter();
+  const { currentPage, navigate } = useRouter('intelligence');
 
   const renderPage = () => {
     switch (currentPage) {
+      case 'mcp':
+        return <MCPPage />;
       case 'chat':
         return <ChatPage />;
       case 'intelligence':
